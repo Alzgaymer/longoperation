@@ -1,0 +1,28 @@
+version: '3.9'
+
+networks:
+  app:
+
+services:
+  app:
+    depends_on:
+      mongo:
+        condition: service_completed_successfully
+    image: cosmtrek/air
+    container_name: app
+    working_dir: /app
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ".:/app"
+    networks:
+      app:
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      app:

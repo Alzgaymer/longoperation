@@ -1,0 +1,89 @@
+openapi: 3.1.0
+info:
+  title: Long operation
+  description: Long operation
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080'
+    description: Local server
+
+components:
+  requestBodies:
+    waitfor:
+      description: Specifies time to wait before operation runs
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              wait-for:
+                type: integer
+                format: int64
+
+  responses:
+    get-waitfor:
+      description: Wait for response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+
+    create-waitfor:
+      description: Wait for response
+      content:
+        application/json:
+          headers:
+            Operation-ID:
+              $ref: "#/components/parameters/operationID"
+            Operation-Link:
+              $ref: "#/components/parameters/operationLocation"
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+
+  parameters:
+    operationID:
+      in: header
+      description: Shows operation ID
+      required: true
+      schema:
+        type: string
+    operationLocation:
+      in: header
+      description: Link to operation
+      required: true
+      schema:
+        type: string
+
+paths:
+  /api/v1/operations:
+    post:
+      description: Runs long running operation
+      summary: Runs long running operation
+      requestBody:
+        $ref: "#/components/requestBodies/waitfor"
+      responses:
+        202:
+          $ref: "#/components/responses/create-waitfor"
+
+  /api/v1/operations/{id}:
+    get:
+      description: Returns operation status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: "#/components/responses/get-waitfor"
