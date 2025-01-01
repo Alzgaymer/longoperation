@@ -1,5 +1,5 @@
 resource "aws_instance" "hello_world" {
-  ami           = "ami-09085dcbbfc5e181e"
-  instance_type = "t2.micro"
+  ami           = "ami-02df5cb5ad97983ba"
+  instance_type = "t3.micro"
   key_name = "terraform"
 }
