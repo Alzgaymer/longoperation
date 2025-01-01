@@ -1,0 +1,9 @@
+version: 3
+
+tasks:
+  cmd:
+    desc: Terraform cmd running in deployment folder
+    label: Terraform command
+    dir: ./deployment
+    cmds:
+      - terraform {{.CLI_ARGS}}
