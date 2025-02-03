@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"golang.org/x/net/context"
 	"log/slog"
 	"net/http"
@@ -15,8 +16,11 @@ import (
 )
 
 func main() {
-	slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	client, err := mongo.Connect()
+
+	mongoURI := os.Getenv("MONGO_URI")
+
+	clientOpts := options.Client().ApplyURI(mongoURI)
+	client, err := mongo.Connect(clientOpts)
 	if err != nil {
 		slog.Error("connect mongo", err)
 		return
@@ -26,8 +30,8 @@ func main() {
 	http.Handle("POST /api/v1/operations", createOperation(client))
 	http.Handle("GET /api/v1/operations/{id}", getOperation(client))
 
-	slog.Info("started server", "port", ":8080")
-	http.ListenAndServe(":8080", nil)
+	slog.Info("started server", "port", ":80")
+	slog.Error("server error", http.ListenAndServe(":80", nil))
 }
 
 func createOperation(client *mongo.Client) http.HandlerFunc {
@@ -35,6 +39,9 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 	type Request struct {
 		WaitFor int64 `json:"wait-for"`
 	}
+
+	var upsert = options.UpdateOne().SetUpsert(true)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req Request
 		err := json.NewDecoder(r.Body).Decode(&req)
@@ -43,13 +50,21 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 			slog.Error("decode request", err)
 			return
 		}
+
 		operationID := uuid.NewString()
-		_, err = coll.InsertOne(context.Background(), bson.D{
-			{"_id", operationID},
-			{"wait-for", req.WaitFor},
-			{"status", "NotStarted"},
-			{"created_at", time.Now()},
-		})
+		_, err = coll.UpdateOne(
+			context.Background(),
+			bson.M{"_id": operationID},
+			bson.M{
+				"$set": bson.D{
+					{"_id", operationID},
+					{"wait-for", req.WaitFor},
+					{"status", "NotStarted"}},
+				"$currentDate": bson.M{
+					"created_at": bson.M{"$type": "date"},
+				}},
+			upsert,
+		)
 		if err != nil {
 			slog.Error("insert operation", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -71,8 +86,7 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 				}},
 				{"$currentDate", bson.D{
 					{"updated_at", true},
-				},
-				},
+				}},
 			})
 			if err != nil {
 				slog.Error("update operation", err)

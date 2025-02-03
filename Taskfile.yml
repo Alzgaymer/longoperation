@@ -2,3 +2,14 @@ version: 3
 
 includes:
   terraform: ./TaskTerraform.yml
+
+tasks:
+
+  app:up:
+    desc: Compose up
+    cmds:
+      - docker compose up -d
+  app:down:
+    desc: Compose down
+    cmds:
+      - docker compose down
