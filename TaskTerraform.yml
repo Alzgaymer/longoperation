@@ -2,7 +2,6 @@ version: 3
 
 tasks:
   terraform:
-
     desc: Terraform binary
     precondition:
       linting:
@@ -14,7 +13,6 @@ tasks:
   lint:
     desc: Terraform linting
     vars:
-      TFLINT_CONFIG: ../.tflint.hcl
       required:
         - TFLINT_CONFIG
     cmd: tflint -c {{.TFLINT_CONFIG}}
