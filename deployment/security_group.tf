@@ -3,20 +3,21 @@ resource "aws_security_group" "long-operation-sg" {
 
   // allow ssh
   ingress {
-    from_port   = 22
-    to_port     = 22
+    from_port   = var.ssh-port
+    to_port     = var.ssh-port
     protocol    = "tcp"
-    cidr_blocks = ["212.23.203.92/32"]
+    cidr_blocks = var.white-list
   }
 
   // allow http
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = var.http-port
+    to_port     = var.http-port
     protocol    = "tcp"
-    cidr_blocks = ["212.23.203.92/32"]
+    cidr_blocks = var.white-list
   }
 
+  // allow access all the internet from container
   egress {
     from_port   = 0
     to_port     = 0

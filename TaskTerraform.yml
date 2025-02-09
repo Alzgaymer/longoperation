@@ -1,9 +1,21 @@
 version: 3
 
 tasks:
-  cmd:
-    desc: Terraform cmd running in deployment folder
-    label: Terraform command
-    dir: ./deployment
-    cmds:
-      - terraform {{.CLI_ARGS}}
+  terraform:
+
+    desc: Terraform binary
+    precondition:
+      linting:
+        sh: task lint
+        msg: Fix linting
+    cmd:
+      terraform {{.CLI_ARGS}}
+
+  lint:
+    desc: Terraform linting
+    vars:
+      TFLINT_CONFIG: ../.tflint.hcl
+      required:
+        - TFLINT_CONFIG
+    cmd: tflint -c {{.TFLINT_CONFIG}}
+
