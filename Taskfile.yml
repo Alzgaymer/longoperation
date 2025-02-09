@@ -18,3 +18,8 @@ tasks:
     desc: Compose down
     cmds:
       - docker compose down
+
+  ssh:
+    desc: Connect to instance via ssh
+    cmds:
+      - ssh -i "~/terraform.pem" ec2-user@ec2-13-60-222-206.eu-north-1.compute.amazonaws.com
