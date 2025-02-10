@@ -7,6 +7,10 @@ tasks:
       linting:
         sh: task lint
         msg: Fix linting
+      formatting:
+        sh: task terraform -- fmt
+        msg: Format .tf files
+
     cmd:
       terraform {{.CLI_ARGS}}
 

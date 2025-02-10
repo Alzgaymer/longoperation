@@ -1,16 +1,16 @@
 variable "region" {
-  type = string
+  type    = string
   default = "eu-north-1"
 }
 
 variable "ssh-port" {
-  type = number
+  type    = number
   default = 22
 }
 
 
 variable "http-port" {
-  type = number
+  type    = number
   default = 80
 }
 
@@ -24,18 +24,18 @@ variable "white-list" {
 
 variable "api-server" {
   type = object({
-    ami       = string
-    instance  = string
-    key-name  = string
-    tags      = map(string)
+    ami      = string
+    instance = string
+    key-name = string
+    tags     = map(string)
   })
 
   default = {
-    "ami": "ami-0f174d97d7d7a029b"
-    "instance": "t3.micro"
-    "key-name":"terraform"
-    "tags": {
-      "Name": "long-operation-api-server"
+    "ami" : "ami-0f174d97d7d7a029b"
+    "instance" : "t3.micro"
+    "key-name" : "terraform"
+    "tags" : {
+      "Name" : "long-operation-api-server"
     }
   }
 }
