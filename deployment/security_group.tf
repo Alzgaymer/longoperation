@@ -20,7 +20,7 @@ resource "aws_security_group_rule" "allow_ssh" {
   cidr_blocks = var.white-list
 }
 
-resource "aws_security_group_rule" "allow_ssh" {
+resource "aws_security_group_rule" "allow_all" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1"
