@@ -1,27 +1,30 @@
 resource "aws_security_group" "long-operation-sg" {
   name = "long-operation-sg"
+}
 
-  // allow ssh
-  ingress {
-    from_port   = var.ssh-port
-    to_port     = var.ssh-port
-    protocol    = "tcp"
-    cidr_blocks = var.white-list
-  }
+resource "aws_security_group_rule" "allow_http" {
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  type              = "ingress"
+  security_group_id = aws_security_group.long-operation-sg.id
+  cidr_blocks = var.white-list
+}
 
-  // allow http
-  ingress {
-    from_port   = var.http-port
-    to_port     = var.http-port
-    protocol    = "tcp"
-    cidr_blocks = var.white-list
-  }
+resource "aws_security_group_rule" "allow_ssh" {
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  type              = "ingress"
+  security_group_id = aws_security_group.long-operation-sg.id
+  cidr_blocks = var.white-list
+}
 
-  // allow access all the internet from container
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_ssh" {
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  type              = "egress"
+  security_group_id = aws_security_group.long-operation-sg.id
+  cidr_blocks = ["0.0.0.0/0"]
 }

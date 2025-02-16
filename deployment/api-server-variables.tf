@@ -3,17 +3,6 @@ variable "region" {
   default = "eu-north-1"
 }
 
-variable "ssh-port" {
-  type    = number
-  default = 22
-}
-
-
-variable "http-port" {
-  type    = number
-  default = 80
-}
-
 variable "white-list" {
   type = list(string)
   default = [
