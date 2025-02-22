@@ -92,24 +92,24 @@ jobs:
       - run: task terraform -- plan
         id: tfplan
 
-      - name: Generate token
-        id: generate_token
-        uses: tibdex/github-app-token@v1
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: Manual Workflow Approval
-        uses: trstringer/manual-approval@v1.9.1
-        with:
-          approvers: Alzgaymer
-          secret: ${{ steps.generate_token.outputs.token }}
-          minimum-approvals: 1
-          issue-title: Deploy Terraform infrastructure
-          issue-body: |
-            Deploying infrastructure from ${{github.ref}}.
-            ${{steps.tfplan.outputs}}
-            Write *deploy* to deploy
-          additional-approved-words: deploy
+#      - name: Generate token
+#        id: generate_token
+#        uses: tibdex/github-app-token@v1
+#        with:
+#          app_id: ${{ secrets.APP_ID }}
+#          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+#
+#      - name: Manual Workflow Approval
+#        uses: trstringer/manual-approval@v1.9.1
+#        with:
+#          approvers: Alzgaymer
+#          secret: ${{ steps.generate_token.outputs.token }}
+#          minimum-approvals: 1
+#          issue-title: Deploy Terraform infrastructure
+#          issue-body: |
+#            Deploying infrastructure from ${{github.ref}}.
+#            ${{steps.tfplan.outputs}}
+#            Write *deploy* to deploy
+#          additional-approved-words: deploy
 
       - run: task terraform -- apply --auto-approve=true
