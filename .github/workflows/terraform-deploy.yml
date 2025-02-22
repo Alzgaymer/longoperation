@@ -7,10 +7,6 @@ on:
   pull_request:
     paths: [deployment/*]
 
-concurrency:
-  group: Prod
-  cancel-in-progress: true
-
 jobs:
   fmt:
     name: Format .tf files
@@ -58,13 +54,12 @@ jobs:
 
       - run: task lint
 
-  terraform:
+  plan:
     needs: tflint
     name: Terraform plan
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    environment: Prod
     steps:
       - name: Install Task
         uses: arduino/setup-task@v2
@@ -93,24 +88,36 @@ jobs:
       - run: task terraform -- plan
         id: tfplan
 
-#      - name: Generate token
-#        id: generate_token
-#        uses: tibdex/github-app-token@v1
-#        with:
-#          app_id: ${{ secrets.APP_ID }}
-#          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-#
-#      - name: Manual Workflow Approval
-#        uses: trstringer/manual-approval@v1.9.1
-#        with:
-#          approvers: Alzgaymer
-#          secret: ${{ steps.generate_token.outputs.token }}
-#          minimum-approvals: 1
-#          issue-title: Deploy Terraform infrastructure
-#          issue-body: |
-#            Deploying infrastructure from ${{github.ref}}.
-#            ${{steps.tfplan.outputs}}
-#            Write *deploy* to deploy
-#          additional-approved-words: deploy
+  deploy:
+    needs: plan
+    name: Deploy terraform infrastructure
+    runs-on: ubuntu-latest
+    environment: Prod
+    permissions:
+      contents: read
+    steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4.1.0
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: 'eu-north-1'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - run: task terraform -- init
 
       - run: task terraform -- apply --auto-approve=true
