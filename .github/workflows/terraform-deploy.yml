@@ -87,11 +87,18 @@ jobs:
       - run: task terraform -- plan
         id: tfplan
 
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Manual Workflow Approval
         uses: trstringer/manual-approval@v1.9.1
         with:
           approvers: Alzgaymer
-          secret: ${{secrets.GITHUB_TOKEN}}
+          secret: ${{ steps.generate_token.outputs.token }}
           minimum-approvals: 1
           issue-title: Deploy Terraform infrastructure
           issue-body: |
