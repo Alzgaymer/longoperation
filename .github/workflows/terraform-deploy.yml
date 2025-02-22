@@ -85,3 +85,19 @@ jobs:
       - run: task terraform -- init
 
       - run: task terraform -- plan
+        id: tfplan
+
+      - name: Manual Workflow Approval
+        uses: trstringer/manual-approval@v1.9.1
+        with:
+          approvers: Alzgaymer
+          secret: ${{secrets.GITHUB_TOKEN}}
+          minimum-approvals: 1
+          issue-title: Deploy Terraform infrastructure
+          issue-body: |
+            Deploying infrastructure from ${{github.ref}}.
+            ${{steps.tfplan.outputs}}
+            Write *deploy* to deploy
+          additional-approved-words: deploy
+
+      - run: task terraform -- apply --auto-approve=true
