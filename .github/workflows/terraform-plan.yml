@@ -1,0 +1,56 @@
+name: Tarraform Plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths: [deployment]
+
+
+jobs:
+  tflint:
+    name: Lint .tf files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4.1.0
+
+      - run: task lint
+
+  terraform:
+    needs: tflint
+    name: Terraform plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4.1.0
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-region: 'eu-north-1'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - run: task terraform -- init
+
+      - run: task terraform -- plan

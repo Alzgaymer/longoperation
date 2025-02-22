@@ -10,6 +10,10 @@ includes:
 
 
 tasks:
+  build:
+    env:
+    cmd: go build main.go
+
   app:up:
     desc: Compose up
     cmds:
