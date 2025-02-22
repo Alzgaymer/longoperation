@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
         "protocol": "tcp"
       }
     ],
-    "user": "server",
+    "user": "server"
   }
 ]
 TASK_DEFINITION
