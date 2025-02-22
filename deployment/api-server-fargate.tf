@@ -7,15 +7,15 @@ resource "aws_ecs_task_definition" "api-long-operation" {
   family                   = "api-long-operation"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = 1
-  memory                   = 16
+  cpu                      = 256
+  memory                   = 512
   container_definitions    = <<TASK_DEFINITION
 [
   {
     "name": "api-long-operation",
     "image": "${aws_ecr_repository.oci_registry.repository_url}/api-long-operation:latest",
-    "cpu": 1,
-    "memory": 16,
+    "cpu": 256,
+    "memory": 512,
     "portMappings": [
       {
         "containerPort": 80,
