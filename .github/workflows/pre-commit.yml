@@ -1,0 +1,46 @@
+name: pre-commit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - uses: actions/checkout@v2
+
+      - name: Check code style first phase
+        uses: pre-commit/action@v2.0.3
+        id: phase1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+
+      - id: fmted
+        run: task fmt
+        continue-on-error: true
+
+      - name: Format .tf files
+        if: steps.fmted.outcome != 0
+        run: task fmt
+
+      - name: Update pull request with fixed formatting
+        if: always() && (steps.phase1.outcome == 'failure')
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          add_options: '-u'
+
+      - name: Check code style second phase
+        if: always() && (steps.phase1.outcome == 'failure')
+        uses: pre-commit/action@v2.0.3
+        id: phase2
