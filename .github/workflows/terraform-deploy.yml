@@ -2,6 +2,8 @@ name: Deploy terraform infrastructure
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+
 
 jobs:
   fmt:
