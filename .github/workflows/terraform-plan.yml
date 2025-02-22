@@ -5,9 +5,7 @@ on:
     branches: [main]
     paths: [deployment/*]
   pull_request:
-    branches: [main]
     paths: [deployment/*]
-
 
 jobs:
   tflint:
