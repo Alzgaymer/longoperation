@@ -20,6 +20,9 @@ jobs:
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4.1.0
 
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - run: task lint
 
   terraform:
