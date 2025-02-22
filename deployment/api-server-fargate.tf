@@ -13,7 +13,6 @@ resource "aws_ecs_task_definition" "api-long-operation" {
 [
   {
     "name": "api-long-operation",
-    "hostname": "api-long-operation",
     "image": "${aws_ecr_repository.oci_registry.repository_url}/api-long-operation:latest",
     "cpu": 1,
     "memory": 16,
