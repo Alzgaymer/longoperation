@@ -37,7 +37,7 @@ jobs:
         if: always() && (steps.fmted.outcome == 'failure')
 
       - uses: stefanzweifel/git-auto-commit-action@v5
-        if: success()
+        if: success() && (steps.fmted.outcome == 'failure')
 
   tflint:
     needs: fmt
