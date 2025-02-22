@@ -7,12 +7,20 @@ tasks:
       linting:
         sh: task lint
         msg: Fix linting
-      formatting:
-        sh: task terraform -- fmt
-        msg: Format .tf files
-
     cmd:
       terraform {{.CLI_ARGS}}
+
+  fmt:
+    desc: Format terraform files
+    precondition:
+      linting:
+        sh: task lint
+        msg: Fix linting
+    cmd: terraform fmt -diff
+
+  fmted:
+    desc: If all files are formatted
+    cmd: terraform fmt -check
 
   lint:
     desc: Terraform linting
