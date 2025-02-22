@@ -8,7 +8,7 @@ resource "aws_security_group_rule" "allow_http" {
   protocol          = "tcp"
   type              = "ingress"
   security_group_id = aws_security_group.long-operation-sg.id
-  cidr_blocks = var.white-list
+  cidr_blocks       = var.white-list
 }
 
 resource "aws_security_group_rule" "allow_ssh" {
@@ -17,7 +17,7 @@ resource "aws_security_group_rule" "allow_ssh" {
   protocol          = "tcp"
   type              = "ingress"
   security_group_id = aws_security_group.long-operation-sg.id
-  cidr_blocks = var.white-list
+  cidr_blocks       = var.white-list
 }
 
 resource "aws_security_group_rule" "allow_all" {
@@ -26,5 +26,5 @@ resource "aws_security_group_rule" "allow_all" {
   protocol          = "-1"
   type              = "egress"
   security_group_id = aws_security_group.long-operation-sg.id
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
 }
