@@ -4,5 +4,5 @@ output "gateway_url" {
 }
 
 output "ecr_repository_url" {
-  value = aws_ecr_repository.api-long_operation.repository_url
+  value = aws_ecr_repository.api-long_operation_registry.repository_url
 }
