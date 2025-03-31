@@ -14,6 +14,11 @@ resource "aws_api_gateway_deployment" "long-op-gateway-deployment" {
     redeployment = sha1(jsonencode(aws_api_gateway_rest_api.long-op-gateway.body))
   }
 
+  depends_on = [
+    aws_api_gateway_integration.long-op-oapi-s3,
+    aws_api_gateway_integration_response.s3_integration_response
+  ]
+
   lifecycle {
     create_before_destroy = true
   }
@@ -46,7 +51,7 @@ resource "aws_api_gateway_integration" "long-op-oapi-s3" {
   integration_http_method = "GET"
 
   uri         = "arn:aws:apigateway:${var.region}:s3:path/${var.oapi-s3-bucket}/index.html"
-  credentials = aws_iam_role_policy.api_gateway_s3_policy.id
+  credentials = aws_iam_role.api_gateway_s3_role.arn
 }
 
 resource "aws_api_gateway_method_response" "s3_response_200" {
@@ -56,12 +61,20 @@ resource "aws_api_gateway_method_response" "s3_response_200" {
   status_code = "200"
 
   response_models = {
-    "application/json" = "Empty"
+    "application/json" = aws_api_gateway_model.empty.name
   }
 
   response_parameters = {
     "method.response.header.Content-Type" = true
   }
+}
+
+resource "aws_api_gateway_model" "empty" {
+  rest_api_id  = aws_api_gateway_rest_api.long-op-gateway.id
+  name         = "Empty"
+  description  = "Empty model"
+  content_type = "application/json"
+  schema       = jsonencode({})
 }
 
 resource "aws_api_gateway_integration_response" "s3_integration_response" {
