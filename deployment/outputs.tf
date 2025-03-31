@@ -3,6 +3,6 @@ output "gateway_url" {
   description = "The URL of the API Gateway deployment"
 }
 
-output "ecr_repository_url" {
+output "ecr_repository_uri" {
   value = aws_ecr_repository.api-long_operation_registry.repository_url
 }
