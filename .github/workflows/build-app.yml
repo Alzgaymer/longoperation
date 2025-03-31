@@ -39,4 +39,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/api_oci_registry:${{ github.sha }}
+          tags: ${{ secrets.ECR_REPOSITORY }}/longoperation:${{ github.sha }}
