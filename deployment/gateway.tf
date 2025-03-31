@@ -1,12 +1,10 @@
 resource "aws_api_gateway_rest_api" "long-op-gateway" {
   name        = "long-op-gateway"
   description = "API Gateway for Long Operation"
-  body        = templatefile(var.oapi-file)
+  body        = file(var.oapi-file)
   endpoint_configuration {
     types = ["REGIONAL"]
   }
-
-
 }
 
 resource "aws_api_gateway_deployment" "long-op-gateway-deployment" {
