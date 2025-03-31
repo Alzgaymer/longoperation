@@ -15,6 +15,7 @@ resource "aws_iam_policy" "s3_policy" {
     ]
 }
 EOF
+
 }
 
 # Create API Gateway Role
