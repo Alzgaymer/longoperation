@@ -1,122 +1,75 @@
-resource "aws_api_gateway_rest_api" "long-op-gateway" {
-  name        = "long-op-gateway"
-  description = "API Gateway for Long Operation"
-  body        = file(var.oapi-file)
-  endpoint_configuration {
-    types = ["REGIONAL"]
-  }
+# Create S3 Full Access Policy
+resource "aws_iam_policy" "s3_policy" {
+  name        = "s3-policy"
+  description = "Policy for allowing all S3 Actions"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
 }
 
-resource "aws_api_gateway_deployment" "long-op-gateway-deployment" {
-  rest_api_id = aws_api_gateway_rest_api.long-op-gateway.id
+# Create API Gateway Role
+resource "aws_iam_role" "s3_api_gateway_role" {
+  name = "s3-api-gateway-role"
+
+  # Create Trust Policy for API Gateway
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Attach S3 Access Policy to the API Gateway Role
+resource "aws_iam_role_policy_attachment" "s3_policy_attach" {
+  role       = aws_iam_role.s3_api_gateway_role.name
+  policy_arn = aws_iam_policy.s3_policy.arn
+}
+
+resource "aws_api_gateway_rest_api" "long-op" {
+  name = "Long Operation API"
+  body = templatefile(var.oapi-file, {
+    role_arn    = aws_iam_role.s3_api_gateway_role.arn,
+    region      = var.region,
+    bucket_name = var.oapi-s3-bucket
+  })
+}
+
+resource "aws_api_gateway_deployment" "S3APIDeployment" {
+  rest_api_id = aws_api_gateway_rest_api.long-op.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.long-op-gateway.body))
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_rest_api.long-op.body,
+    ]))
   }
-
-  depends_on = [
-    aws_api_gateway_integration.long-op-oapi-s3,
-    aws_api_gateway_integration_response.s3_integration_response
-  ]
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
-resource "aws_api_gateway_stage" "long-op-gateway-stage" {
-  deployment_id = aws_api_gateway_deployment.long-op-gateway-deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.long-op-gateway.id
+resource "aws_api_gateway_stage" "dev" {
+  deployment_id = aws_api_gateway_deployment.S3APIDeployment.id
+  rest_api_id   = aws_api_gateway_rest_api.long-op.id
   stage_name    = "dev"
-}
-
-resource "aws_api_gateway_resource" "long-op-oapi-swagger" {
-  rest_api_id = aws_api_gateway_rest_api.long-op-gateway.id
-  parent_id   = aws_api_gateway_rest_api.long-op-gateway.root_resource_id
-  path_part   = "oapi"
-}
-
-resource "aws_api_gateway_method" "long-op-oapi-swagger" {
-  resource_id   = aws_api_gateway_resource.long-op-oapi-swagger.id
-  rest_api_id   = aws_api_gateway_rest_api.long-op-gateway.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_integration" "long-op-oapi-s3" {
-  http_method             = aws_api_gateway_method.long-op-oapi-swagger.http_method
-  resource_id             = aws_api_gateway_resource.long-op-oapi-swagger.id
-  rest_api_id             = aws_api_gateway_rest_api.long-op-gateway.id
-  type                    = "AWS"
-  integration_http_method = "GET"
-
-  uri         = "arn:aws:apigateway:${var.region}:s3:path/${var.oapi-s3-bucket}/index.html"
-  credentials = aws_iam_role.api_gateway_s3_role.arn
-}
-
-resource "aws_api_gateway_method_response" "s3_response_200" {
-  rest_api_id = aws_api_gateway_rest_api.long-op-gateway.id
-  resource_id = aws_api_gateway_resource.long-op-oapi-swagger.id
-  http_method = aws_api_gateway_method.long-op-oapi-swagger.http_method
-  status_code = "200"
-
-  response_models = {
-    "application/json" = aws_api_gateway_model.empty.name
-  }
-
-  response_parameters = {
-    "method.response.header.Content-Type" = true
-  }
-}
-
-resource "aws_api_gateway_model" "empty" {
-  rest_api_id  = aws_api_gateway_rest_api.long-op-gateway.id
-  name         = "Empty"
-  description  = "Empty model"
-  content_type = "application/json"
-  schema       = jsonencode({})
-}
-
-resource "aws_api_gateway_integration_response" "s3_integration_response" {
-  rest_api_id = aws_api_gateway_rest_api.long-op-gateway.id
-  resource_id = aws_api_gateway_resource.long-op-oapi-swagger.id
-  http_method = aws_api_gateway_method.long-op-oapi-swagger.http_method
-  status_code = aws_api_gateway_method_response.s3_response_200.status_code
-
-  response_parameters = {
-    "method.response.header.Content-Type" = "integration.response.header.Content-Type"
-  }
-}
-
-// This IAM role allows API Gateway to access the S3 bucket
-resource "aws_iam_role" "api_gateway_s3_role" {
-  name = "api_gateway_s3_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "apigateway.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "api_gateway_s3_policy" {
-  name = "api_gateway_s3_policy"
-  role = aws_iam_role.api_gateway_s3_role.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action   = "s3:GetObject"
-        Effect   = "Allow"
-        Resource = "arn:aws:s3:::${var.oapi-s3-bucket}/*"
-      }
-    ]
-  })
 }

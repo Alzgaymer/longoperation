@@ -1,5 +1,5 @@
 output "gateway_url" {
-  value       = aws_api_gateway_deployment.long-op-gateway-deployment.invoke_url
+  value       = aws_api_gateway_stage.dev.invoke_url
   description = "The URL of the API Gateway deployment"
 }
 

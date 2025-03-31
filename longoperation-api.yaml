@@ -74,6 +74,20 @@ paths:
       responses:
         202:
           $ref: "#/components/responses/create-waitfor"
+      x-amazon-apigateway-integration:
+        type: "mock"
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200,
+              "body": {
+                "id": "$context.requestId",
+                "status": "SUCCESS"
+              }
+            }
+        responses:
+          default:
+            statusCode: "200"
 
   /api/v1/operations/{id}:
     get:
@@ -87,3 +101,55 @@ paths:
       responses:
         200:
           $ref: "#/components/responses/get-waitfor"
+      x-amazon-apigateway-integration:
+        type: "mock"
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200,
+              "body": {
+                "id": "$context.requestId",
+                "status": "SUCCESS"
+              }
+            }
+        responses:
+          default:
+            statusCode: "200"
+
+
+  /oapi/{file}:
+    get:
+      summary: "Get Swagger UI index page"
+      parameters:
+        - name: file
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "200 response"
+          headers:
+            Content-Type:
+              schema:
+                type: "string"
+          content:
+            text/html: { }
+      x-amazon-apigateway-integration:
+        type: "aws"
+        credentials: "${role_arn}"
+        uri: "arn:aws:apigateway:${region}:s3:path/${bucket_name}/{file}"
+        requestParameters:
+          integration.request.path.file: method.request.path.file
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Content-Type: "integration.response.header.Content-Type"
+              responseParameters:
+                method.response.header.Content-Type: "integration.response.header.Content-Type"
+                method.response.header.Access-Control-Allow-Origin: "'*'"
+                method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
