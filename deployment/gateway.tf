@@ -5,6 +5,8 @@ resource "aws_api_gateway_rest_api" "long-op-gateway" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
+
+
 }
 
 resource "aws_api_gateway_deployment" "long-op-gateway-deployment" {
