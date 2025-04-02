@@ -131,7 +131,7 @@ resource "aws_lb" "fargate_nlb" {
 # Target group for the NLB
 resource "aws_lb_target_group" "fargate" {
   name        = "fargate-tg"
-  port        = 8080
+  port        = 80
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id

@@ -76,7 +76,7 @@ components:
   x-amazon-apigateway-integrations:
     fargateIntegration:
       type: "http_proxy"
-      uri: "${fargate_service_url}"
+      uri: "${fargate_service_url}/api/v1/operations"
       httpMethod: "POST"
       connectionType: "VPC_LINK"
       connectionId: "${vpc_link_id}"
@@ -85,7 +85,7 @@ components:
 
     fargateGetIntegration:
       type: "http_proxy"
-      uri: "${fargate_service_url}/{id}"
+      uri: "${fargate_service_url}/api/v1/operations/{id}"
       httpMethod: "GET"
       connectionType: "VPC_LINK"
       connectionId: "${vpc_link_id}"
