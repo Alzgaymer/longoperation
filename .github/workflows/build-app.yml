@@ -1,10 +1,12 @@
 name: Build app and upload to the ECR
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - '**/*.go'
+  workflow_dispatch:
 
 jobs:
   build:
