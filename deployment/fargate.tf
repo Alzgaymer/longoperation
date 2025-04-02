@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "api-long-operation-cluster" {
-  name = "Long operation API cluster"
+  name = "LongOperationAPI"
 }
 
 resource "aws_ecs_service" "api-long-operation" {
