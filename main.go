@@ -23,7 +23,7 @@ func main() {
 	clientOpts := options.Client().ApplyURI(mongoURI)
 	client, err := mongo.Connect(clientOpts)
 	if err != nil {
-		slog.Error("connect mongo", err)
+		slog.Error("connect mongo", "err", err)
 		return
 	}
 	defer client.Disconnect(context.Background())
