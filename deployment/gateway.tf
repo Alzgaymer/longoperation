@@ -10,7 +10,7 @@ resource "aws_iam_policy" "s3_policy" {
         {
             "Effect": "Allow",
             "Action": "s3:GetObject",
-            "Resource": "*"
+            "Resource": "arn:aws:s3:::${var.oapi-s3-bucket}/*"
         }
     ]
 }
