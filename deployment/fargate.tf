@@ -50,9 +50,18 @@ resource "aws_ecs_task_definition" "api-long-operation" {
           appProtocol   = "http"
         }
       ]
-      user = "server"
+      user = "10001"
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/api-long-operation"
+          "awslogs-region"        = var.region
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
     }
   ])
+
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {

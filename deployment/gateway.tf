@@ -53,7 +53,7 @@ resource "aws_api_gateway_rest_api" "long-op" {
     role_arn            = aws_iam_role.s3_api_gateway_role.arn,
     region              = var.region,
     bucket_name         = var.oapi-s3-bucket,
-    fargate_service_url = "http://${aws_lb.fargate_nlb.dns_name}",
+    fargate_service_url = aws_lb.fargate_nlb.dns_name,
     vpc_link_id         = aws_api_gateway_vpc_link.fargate.id
   })
 }
