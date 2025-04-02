@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
   container_definitions = jsonencode([
     {
       name   = "api-long-operation"
-      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}/api-long-operation:latest"
+      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}:latest"
       cpu    = 256
       memory = 512
       portMappings = [
