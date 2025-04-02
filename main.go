@@ -30,7 +30,7 @@ func main() {
 	http.Handle("POST /api/v1/operations", createOperation(client))
 	http.Handle("GET /api/v1/operations/{id}", getOperation(client))
 
-	slog.Info("Started server", "port", ":80")
+	slog.Info("started server", "port", ":80")
 	slog.Error("server error", http.ListenAndServe(":80", nil))
 }
 
