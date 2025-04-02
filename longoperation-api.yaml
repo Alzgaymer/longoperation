@@ -73,44 +73,6 @@ components:
       schema:
         type: string
 
-  x-amazon-apigateway-integrations:
-    fargateIntegration:
-      type: "http_proxy"
-      uri: "http://${fargate_service_url}/api/v1/operations"
-      httpMethod: "POST"
-      connectionType: "VPC_LINK"
-      connectionId: "${vpc_link_id}"
-      passthroughBehavior: "when_no_match"
-      timeoutInMillis: 29000
-
-    fargateGetIntegration:
-      type: "http_proxy"
-      uri: "http://${fargate_service_url}/api/v1/operations/{id}"
-      httpMethod: "GET"
-      connectionType: "VPC_LINK"
-      connectionId: "${vpc_link_id}"
-      requestParameters:
-        integration.request.path.id: "method.request.path.id"
-      passthroughBehavior: "when_no_match"
-      timeoutInMillis: 29000
-
-    s3Integration:
-      type: "aws"
-      credentials: "${role_arn}"
-      uri: "arn:aws:apigateway:${region}:s3:path/${bucket_name}/{file}"
-      requestParameters:
-        integration.request.path.file: method.request.path.file
-      responses:
-        default:
-          statusCode: "200"
-          responseParameters:
-            method.response.header.Content-Type: "integration.response.header.Content-Type"
-            method.response.header.Access-Control-Allow-Origin: "'*'"
-            method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-      passthroughBehavior: "when_no_match"
-      httpMethod: "GET"
-
 paths:
   /api/v1/operations:
     post:
@@ -122,7 +84,13 @@ paths:
         202:
           $ref: "#/components/responses/create-waitfor"
       x-amazon-apigateway-integration:
-        $ref: "#/components/x-amazon-apigateway-integrations/fargateIntegration"
+        type: "http_proxy"
+        uri: "http://${fargate_service_url}/api/v1/operations"
+        httpMethod: "POST"
+        connectionType: "VPC_LINK"
+        connectionId: "${vpc_link_id}"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
 
   /api/v1/operations/{id}:
     get:
@@ -133,7 +101,15 @@ paths:
         200:
           $ref: "#/components/responses/get-waitfor"
       x-amazon-apigateway-integration:
-        $ref: "#/components/x-amazon-apigateway-integrations/fargateGetIntegration"
+        type: "http_proxy"
+        uri: "http://${fargate_service_url}/api/v1/operations/{id}"
+        httpMethod: "GET"
+        connectionType: "VPC_LINK"
+        connectionId: "${vpc_link_id}"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+        passthroughBehavior: "when_no_match"
+        timeoutInMillis: 29000
 
   /oapi/{file}:
     get:
@@ -150,4 +126,18 @@ paths:
           content:
             text/html: { }
       x-amazon-apigateway-integration:
-        $ref: "#/components/x-amazon-apigateway-integrations/s3Integration"
+        type: "aws"
+        credentials: "${role_arn}"
+        uri: "arn:aws:apigateway:${region}:s3:path/${bucket_name}/{file}"
+        requestParameters:
+          integration.request.path.file: method.request.path.file
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Content-Type: "integration.response.header.Content-Type"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
