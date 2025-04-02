@@ -119,7 +119,3 @@ jobs:
       - run: task terraform -- init
 
       - run: task terraform -- apply --auto-approve=true
-
-      - name: Set ECR repository URI
-        id: set-ecr-uri
-        run: task terraform  -- output -raw ecr_repository_uri > $GITHUB_ENV
