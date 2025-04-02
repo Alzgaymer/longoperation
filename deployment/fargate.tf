@@ -10,6 +10,16 @@ resource "aws_ecs_service" "api-long-operation" {
 
   cluster         = aws_ecs_cluster.api-long-operation-cluster.id
   task_definition = aws_ecs_task_definition.api-long-operation.arn
+
+  network_configuration {
+    subnets         = aws_subnet.private[*].id
+    security_groups = [aws_security_group.long-operation-sg.id]
+  }
+  load_balancer {
+    target_group_arn = aws_lb_target_group.fargate.arn
+    container_name   = "api-long-operation"
+    container_port   = 80
+  }
 }
 
 resource "aws_ecs_task_definition" "api-long-operation" {

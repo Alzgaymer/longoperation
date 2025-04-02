@@ -1,5 +1,6 @@
 resource "aws_security_group" "long-operation-sg" {
-  name = "long-operation-sg"
+  name   = "long-operation-sg"
+  vpc_id = aws_vpc.main.id
 }
 
 resource "aws_security_group_rule" "allow_http" {

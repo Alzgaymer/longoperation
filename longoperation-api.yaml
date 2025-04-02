@@ -20,49 +20,96 @@ components:
                 type: integer
                 format: int64
 
+  schemas:
+    operationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+
   responses:
     get-waitfor:
       description: Wait for response
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              id:
-                type: string
-              status:
-                type: string
+            $ref: '#/components/schemas/operationResponse'
 
     create-waitfor:
       description: Wait for response
+      headers:
+        Operation-ID:
+          $ref: "#/components/headers/operationID"
+        Operation-Link:
+          $ref: "#/components/headers/operationLocation"
       content:
         application/json:
-          headers:
-            Operation-ID:
-              $ref: "#/components/parameters/operationID"
-            Operation-Link:
-              $ref: "#/components/parameters/operationLocation"
           schema:
-            type: object
-            properties:
-              id:
-                type: string
-              status:
-                type: string
+            $ref: '#/components/schemas/operationResponse'
 
-  parameters:
+  headers:
     operationID:
-      in: header
       description: Shows operation ID
-      required: true
       schema:
         type: string
     operationLocation:
-      in: header
       description: Link to operation
+      schema:
+        type: string
+
+  parameters:
+    operationIdPath:
+      in: path
+      name: id
       required: true
       schema:
         type: string
+    filePath:
+      in: path
+      name: file
+      required: true
+      schema:
+        type: string
+
+  x-amazon-apigateway-integrations:
+    fargateIntegration:
+      type: "http_proxy"
+      uri: "${fargate_service_url}"
+      httpMethod: "POST"
+      connectionType: "VPC_LINK"
+      connectionId: "${vpc_link_id}"
+      passthroughBehavior: "when_no_match"
+      timeoutInMillis: 29000
+
+    fargateGetIntegration:
+      type: "http_proxy"
+      uri: "${fargate_service_url}/{id}"
+      httpMethod: "GET"
+      connectionType: "VPC_LINK"
+      connectionId: "${vpc_link_id}"
+      requestParameters:
+        integration.request.path.id: "method.request.path.id"
+      passthroughBehavior: "when_no_match"
+      timeoutInMillis: 29000
+
+    s3Integration:
+      type: "aws"
+      credentials: "${role_arn}"
+      uri: "arn:aws:apigateway:${region}:s3:path/${bucket_name}/{file}"
+      requestParameters:
+        integration.request.path.file: method.request.path.file
+      responses:
+        default:
+          statusCode: "200"
+          responseParameters:
+            method.response.header.Content-Type: "integration.response.header.Content-Type"
+            method.response.header.Access-Control-Allow-Origin: "'*'"
+            method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+            method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      passthroughBehavior: "when_no_match"
+      httpMethod: "GET"
 
 paths:
   /api/v1/operations:
@@ -75,57 +122,24 @@ paths:
         202:
           $ref: "#/components/responses/create-waitfor"
       x-amazon-apigateway-integration:
-        type: "mock"
-        requestTemplates:
-          application/json: |
-            {
-              "statusCode": 200,
-              "body": {
-                "id": "$context.requestId",
-                "status": "SUCCESS"
-              }
-            }
-        responses:
-          default:
-            statusCode: "200"
+        $ref: "#/components/x-amazon-apigateway-integrations/fargateIntegration"
 
   /api/v1/operations/{id}:
     get:
       description: Returns operation status
       parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/operationIdPath"
       responses:
         200:
           $ref: "#/components/responses/get-waitfor"
       x-amazon-apigateway-integration:
-        type: "mock"
-        requestTemplates:
-          application/json: |
-            {
-              "statusCode": 200,
-              "body": {
-                "id": "$context.requestId",
-                "status": "SUCCESS"
-              }
-            }
-        responses:
-          default:
-            statusCode: "200"
-
+        $ref: "#/components/x-amazon-apigateway-integrations/fargateGetIntegration"
 
   /oapi/{file}:
     get:
       summary: "Get Swagger UI index page"
       parameters:
-        - name: file
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/filePath"
       responses:
         '200':
           description: "200 response"
@@ -136,20 +150,4 @@ paths:
           content:
             text/html: { }
       x-amazon-apigateway-integration:
-        type: "aws"
-        credentials: "${role_arn}"
-        uri: "arn:aws:apigateway:${region}:s3:path/${bucket_name}/{file}"
-        requestParameters:
-          integration.request.path.file: method.request.path.file
-        responses:
-          default:
-            statusCode: "200"
-            responseParameters:
-              method.response.header.Content-Type: "integration.response.header.Content-Type"
-              responseParameters:
-                method.response.header.Content-Type: "integration.response.header.Content-Type"
-                method.response.header.Access-Control-Allow-Origin: "'*'"
-                method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
-                method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        passthroughBehavior: "when_no_match"
-        httpMethod: "GET"
+        $ref: "#/components/x-amazon-apigateway-integrations/s3Integration"
