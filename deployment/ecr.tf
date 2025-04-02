@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "api-long_operation_registry" {
-  name                 = "api-long_operation"
+  name                 = "api-long-operation"
   image_tag_mutability = "IMMUTABLE"
 
   tags = {
