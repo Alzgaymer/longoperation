@@ -37,7 +37,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
           containerPort = 80
           hostPort      = 80
           protocol      = "tcp"
-          appProtocol   = "HTTP"
+          appProtocol   = "http"
         }
       ]
       user = "server"
