@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "api-long-operation-cluster" {
 }
 
 resource "aws_ecs_service" "api-long-operation" {
-  name                 = "Long operation API service"
+  name                 = "LongOperationAPI"
   launch_type          = "FARGATE"
   desired_count        = 1
   force_new_deployment = true
