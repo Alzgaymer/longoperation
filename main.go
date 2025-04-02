@@ -16,6 +16,7 @@ import (
 )
 
 func main() {
+	slog.Info("Long Operation server starting...")
 
 	mongoURI := os.Getenv("MONGO_URI")
 

@@ -41,4 +41,4 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/api-long_operation:latest
+          tags: ${{ steps.login-ecr.outputs.registry }}/api-long-operation:latest
