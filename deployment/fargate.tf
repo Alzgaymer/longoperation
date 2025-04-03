@@ -50,10 +50,16 @@ resource "aws_ecs_task_definition" "api-long-operation" {
           appProtocol   = "http"
         }
       ]
-      environment : [
-
-      ],
-
+      secrets = [
+        {
+          name      = "MONGODB_USERNAME"
+          valueFrom = "${module.mongo_secrets.secret_arn}:username::"
+        },
+        {
+          name      = "MONGODB_PASSWORD"
+          valueFrom = "${module.mongo_secrets.secret_arn}:password::"
+        }
+      ]
       user = "10001"
       logConfiguration = {
         logDriver = "awslogs"
