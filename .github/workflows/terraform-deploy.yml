@@ -85,7 +85,7 @@ jobs:
 
       - run: task terraform -- plan
         id: tfplan
-        with:
+        env:
           TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
           TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
 
@@ -122,6 +122,6 @@ jobs:
       - run: task terraform -- init
 
       - run: task terraform -- apply --auto-approve=true
-        with:
+        env:
           TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
           TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
