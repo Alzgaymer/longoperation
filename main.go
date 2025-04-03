@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"golang.org/x/net/context"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -34,17 +35,15 @@ func main() {
 func ConnectMongoOrDie() *mongo.Client {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	uri := fmt.Sprintf(fmtConnString, os.Getenv("MONGO_USERNAME"), os.Getenv("MONGO_PASSWORD"))
-	opts := options.Client().
-		SetServerAPIOptions(serverAPI).
-		ApplyURI(uri)
 
+	opts := options.Client().SetServerAPIOptions(serverAPI).ApplyURI(uri)
 	client, err := mongo.Connect(opts)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	if err = client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		panic(err)
+	if err = client.Ping(context.Background(), readpref.Primary()); err != nil {
+		log.Fatal(err)
 	}
 
 	slog.Info("Connected to MongoDB")
