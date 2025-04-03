@@ -12,11 +12,12 @@ module "mongo_secrets" {
   create_policy       = true
   block_public_policy = true
   policy_statements = {
-    ecs_tasks = {
-      sid = "AllowEcsTaskToReadSecret"
+    esc_tasks_read = {
+      sid    = "AllowEcsTaskToReadSecret"
+      effect = "Allow"
       principals = [{
         type        = "AWS"
-        identifiers = [aws_ecs_cluster.api-long-operation-cluster.arn]
+        identifiers = ["*"]
       }]
       actions   = ["secretsmanager:GetSecretValue"]
       resources = ["*"]
