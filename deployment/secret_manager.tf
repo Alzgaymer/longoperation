@@ -24,5 +24,4 @@ module "mongo_secrets" {
   name          = each.value.key
   description   = each.value.description
   secret_string = each.value.value
-  create_policy = true
 }
