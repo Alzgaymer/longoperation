@@ -27,7 +27,7 @@ module "mongo_secrets" {
               "ecs-tasks.amazonaws.com",
             ]
           }
-          Resource = module.mongo_secrets.secret_arn
+          Resource = "*"
         }
       ]
     }
