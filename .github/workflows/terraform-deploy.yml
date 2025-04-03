@@ -85,6 +85,9 @@ jobs:
 
       - run: task terraform -- plan
         id: tfplan
+        with:
+          TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
+          TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
 
   deploy:
     needs: plan
@@ -109,7 +112,7 @@ jobs:
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v4.1.0
         with:
-          aws-region: 'eu-north-1'
+          aws-region: ${{secrets.AWS_REGION}}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
@@ -119,3 +122,6 @@ jobs:
       - run: task terraform -- init
 
       - run: task terraform -- apply --auto-approve=true
+        with:
+          TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
+          TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
