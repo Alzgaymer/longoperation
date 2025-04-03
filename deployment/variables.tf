@@ -20,3 +20,15 @@ variable "oapi-s3-bucket" {
   type    = string
   default = "oapi-spec"
 }
+
+variable "mongo_password" {
+  description = "Mongo Atlas database password"
+  type        = string
+  sensitive   = true
+}
+
+variable "mongo_username" {
+  description = "Mongo Atlas database mongo_username"
+  type        = string
+  sensitive   = true
+}
