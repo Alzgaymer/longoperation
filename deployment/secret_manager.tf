@@ -23,7 +23,7 @@ module "mongo_secrets" {
           Principal = {
             Service = "ecs-tasks.amazonaws.com",
           }
-          Resource = "arn:aws:secretmanager:::MONGODB_CREDENTIALS",
+          Resource = "arn:aws:secretsmanager:::secret:MONGODB_CREDENTIALS*",
         }
       ]
     }
