@@ -19,15 +19,13 @@ module "mongo_secrets" {
         {
           Sid    = "AllowEcsTaskToReadSecret"
           Effect = "Allow"
-          Action = [
-            "secretsmanager:GetSecretValue",
-          ]
-          Principals = {
+          Action = "secretsmanager:GetSecretValue",
+          Principal = {
             Service = [
               "ecs-tasks.amazonaws.com",
             ]
           }
-          Resource = "*"
+          Resource = "arn:aws:secretmanager:::MONGODB_CREDENTIALS"
         }
       ]
     }
