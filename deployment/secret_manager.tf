@@ -17,13 +17,13 @@ module "mongo_secrets" {
       Id      = "mongodb-credentials-policy"
       Statement = [
         {
-          Sid    = "AllowEcsTaskToReadSecret",
-          Effect = "Allow",
-          Action = "secretsmanager:GetSecretValue",
+          Sid    = "AllowEcsTaskToReadSecret"
+          Effect = "Allow"
+          Action = "secretsmanager:GetSecretValue"
           Principal = {
-            Service = "ecs-tasks.amazonaws.com",
+            Service = "ecs-tasks.amazonaws.com"
           }
-          Resource = "arn:aws:secretsmanager:::secret:MONGODB_CREDENTIALS*",
+          Resource = "*"
         }
       ]
     }
