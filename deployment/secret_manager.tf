@@ -18,8 +18,8 @@ module "mongo_secrets" {
         type        = "AWS"
         identifiers = [aws_ecs_cluster.api-long-operation-cluster.arn]
       }]
-      actions   = "secretsmanager:GetSecretValue"
-      resources = "*"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
     }
   }
 }
