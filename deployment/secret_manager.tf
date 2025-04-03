@@ -17,7 +17,7 @@ module "mongo_secrets" {
       effect = "Allow"
       principals = [{
         type        = "AWS"
-        identifiers = [aws_iam_role.ecs_task_execution_role.arn]
+        identifiers = ["arn:aws:iam:::role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"]
       }]
       actions   = ["secretsmanager:GetSecretValue"]
       resources = ["*"]
