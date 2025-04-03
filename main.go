@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo/readpref"
 	"golang.org/x/net/context"
 	"log/slog"
 	"net/http"
@@ -15,17 +16,12 @@ import (
 	"time"
 )
 
+const fmtConnString = "mongodb+srv://%s:%s@cl0.rgx0lpn.mongodb.net/?retryWrites=true&w=majority&appName=cl0"
+
 func main() {
 	slog.Info("Long Operation server starting...")
 
-	mongoURI := os.Getenv("MONGO_URI")
-
-	clientOpts := options.Client().ApplyURI(mongoURI)
-	client, err := mongo.Connect(clientOpts)
-	if err != nil {
-		slog.Error("connect mongo", "err", err)
-		return
-	}
+	client := ConnectMongoOrDie()
 	defer client.Disconnect(context.Background())
 
 	http.Handle("POST /api/v1/operations", createOperation(client))
@@ -33,6 +29,27 @@ func main() {
 
 	slog.Info("Started server", "port", ":80")
 	slog.Error("server error", http.ListenAndServe(":80", nil))
+}
+
+func ConnectMongoOrDie() *mongo.Client {
+	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	uri := fmt.Sprintf(fmtConnString, os.Getenv("MONGO_USERNAME"), os.Getenv("MONGO_PASSWORD"))
+	opts := options.Client().
+		SetServerAPIOptions(serverAPI).
+		ApplyURI(uri)
+
+	client, err := mongo.Connect(opts)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = client.Ping(context.TODO(), readpref.Primary()); err != nil {
+		panic(err)
+	}
+
+	slog.Info("Connected to MongoDB")
+
+	return client
 }
 
 func createOperation(client *mongo.Client) http.HandlerFunc {
