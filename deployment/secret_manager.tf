@@ -12,15 +12,17 @@ module "mongo_secrets" {
   create_policy       = true
   block_public_policy = true
   policy_statements = {
-    Sid    = "AllowEcsTaskToReadSecret"
-    Effect = "Allow"
-    Action = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
-    ]
-    Principal = {
-      Service = "ecs-tasks.amazonaws.com"
+    ecs_tasks = {
+      Sid    = "AllowEcsTaskToReadSecret"
+      Effect = "Allow"
+      Action = [
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret"
+      ]
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Resource = module.mongo_secrets.secret_arn
     }
-    Resource = "*"
   }
 }
