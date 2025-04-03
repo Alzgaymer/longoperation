@@ -50,6 +50,10 @@ resource "aws_ecs_task_definition" "api-long-operation" {
           appProtocol   = "http"
         }
       ]
+      environment : [
+
+      ],
+
       user = "10001"
       logConfiguration = {
         logDriver = "awslogs"
