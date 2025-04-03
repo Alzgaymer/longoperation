@@ -1,11 +1,13 @@
 locals {
   mongo_secrets = {
     USERNAME = {
+      key         = "MONGO_USERNAME"
       description = "Mongo atlas database username"
       value       = var.mongo_username
       sensitive   = true
     }
     PASSWORD = {
+      key         = "MONGO_PASSWORD"
       description = "Mongo atlas database password"
       value       = var.mongo_password
       sensitive   = true
@@ -19,9 +21,8 @@ module "mongo_secrets" {
 
   for_each = local.mongo_secrets
 
-  name_prefix   = "MONGO_"
-  name          = each.key
+  name          = each.value.key
   description   = each.value.description
-  create_policy = true
   secret_string = each.value.value
+  create_policy = true
 }
