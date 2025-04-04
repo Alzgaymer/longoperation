@@ -117,6 +117,6 @@ resource "aws_iam_role_policy_attachment" "ecs_logging_policy_attachment" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_secrets_attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.arn
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = module.mongo_secrets.secret_arn
 }
