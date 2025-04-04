@@ -34,7 +34,15 @@ func main() {
 
 func ConnectMongoOrDie() *mongo.Client {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	uri := fmt.Sprintf(fmtConnString, os.Getenv("MONGO_USERNAME"), os.Getenv("MONGO_PASSWORD"))
+
+	username := os.Getenv("MONGO_USERNAME")
+	password := os.Getenv("MONGO_PASSWORD")
+
+	slog.Info("Retrieving MongoDB credentials", "username", username, "password", password)
+
+	uri := fmt.Sprintf(fmtConnString, username, password)
+
+	slog.Info("Connecting to MongoDB", "uri", uri)
 
 	opts := options.Client().SetServerAPIOptions(serverAPI).ApplyURI(uri)
 	client, err := mongo.Connect(opts)
