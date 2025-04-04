@@ -10,3 +10,7 @@ output "ecr_repository_uri" {
 output "templated_oapi_file" {
   value = aws_api_gateway_rest_api.long-op.body
 }
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
