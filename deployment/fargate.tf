@@ -52,13 +52,9 @@ resource "aws_ecs_task_definition" "api-long-operation" {
       ]
       secrets = [
         {
-          name      = "MONGODB_USERNAME"
-          valueFrom = "${module.mongo_secrets.secret_arn}:username::"
+          name      = "MONGODB_CREDENTIALS"
+          valueFrom = module.mongo_secrets.secret_arn
         },
-        {
-          name      = "MONGODB_PASSWORD"
-          valueFrom = "${module.mongo_secrets.secret_arn}:password::"
-        }
       ]
       user = "10001"
       logConfiguration = {

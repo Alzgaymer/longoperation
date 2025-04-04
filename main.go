@@ -35,12 +35,22 @@ func main() {
 func ConnectMongoOrDie() *mongo.Client {
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 
-	username := os.Getenv("MONGO_USERNAME")
-	password := os.Getenv("MONGO_PASSWORD")
+	credsStr := os.Getenv("MONGODB_CREDENTIALS")
 
-	slog.Info("Retrieving MongoDB credentials", "username", username, "password", password)
+	slog.Info("Retrieving MongoDB credentials", "creds", credsStr)
 
-	uri := fmt.Sprintf(fmtConnString, username, password)
+	type MongoCredentials struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	var creds MongoCredentials
+	err := json.Unmarshal([]byte(credsStr), &creds)
+	if err != nil {
+		log.Fatal("mapping credentials", err)
+	}
+
+	uri := fmt.Sprintf(fmtConnString, creds.Username, creds.Password)
 
 	slog.Info("Connecting to MongoDB", "uri", uri)
 
