@@ -12,7 +12,7 @@ terraform {
     encrypt = true
     bucket  = "alzgaymer-terraform"
     key     = "api/long-operation/terraform.tfstate"
-    region  = var.region
+    region  = "eu-north-1"
   }
 }
 
