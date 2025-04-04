@@ -36,3 +36,6 @@ jobs:
       - run: task terraform -- init
 
       - run: task terraform -- apply -destroy --auto-approve=true
+        env:
+          TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
+          TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
