@@ -16,5 +16,5 @@ output "vpc_id" {
 }
 
 output "public_ip" {
-  value = aws_nat_gateway.nat.public_ip
+  value = aws_nat_gateway.nat[*].public_ip
 }
