@@ -143,6 +143,7 @@ resource "aws_lb_target_group" "fargate" {
     unhealthy_threshold = 2
     path                = "/health"
     protocol            = "HTTP"
+    matcher             = "200"
   }
 }
 
