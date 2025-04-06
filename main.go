@@ -27,9 +27,15 @@ func main() {
 
 	http.Handle("POST /api/v1/operations", createOperation(client))
 	http.Handle("GET /api/v1/operations/{id}", getOperation(client))
+	http.HandleFunc("GET /health", healthCheck)
 
-	slog.Info("Started server", "port", ":80")
-	slog.Error("server error", http.ListenAndServe(":80", nil))
+	port := "80"
+	if envPort := os.Getenv("PORT"); envPort != "" {
+		port = envPort
+	}
+
+	slog.Info("Started server", "port", port)
+	slog.Error("server error", http.ListenAndServe(":"+port, nil))
 }
 
 func ConnectMongoOrDie() *mongo.Client {
@@ -37,7 +43,7 @@ func ConnectMongoOrDie() *mongo.Client {
 
 	credsStr := os.Getenv("MONGODB_CREDENTIALS")
 
-	slog.Info("Retrieving MongoDB credentials", "creds", credsStr)
+	slog.Debug("Retrieving MongoDB credentials", "creds", credsStr)
 
 	type MongoCredentials struct {
 		Username string `json:"username"`
@@ -68,6 +74,8 @@ func ConnectMongoOrDie() *mongo.Client {
 
 	return client
 }
+
+func healthCheck(w http.ResponseWriter, r *http.Request) { return }
 
 func createOperation(client *mongo.Client) http.HandlerFunc {
 	coll := client.Database("test").Collection("operations")
