@@ -142,8 +142,7 @@ resource "aws_lb_target_group" "fargate" {
     timeout             = 5
     unhealthy_threshold = 2
     path                = "/health"
-    protocol            = "TCP"
-    matcher             = "200-299"
+    protocol            = "HTTP"
   }
 }
 
