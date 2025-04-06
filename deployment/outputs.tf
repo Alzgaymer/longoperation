@@ -14,3 +14,7 @@ output "templated_oapi_file" {
 output "vpc_id" {
   value = aws_vpc.main.id
 }
+
+output "public_ip" {
+  value = aws_nat_gateway.nat.public_ip
+}
