@@ -37,6 +37,6 @@ USER appuser
 
 COPY --from=build /bin/server /bin/
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT [ "/bin/server" ]

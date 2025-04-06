@@ -44,8 +44,8 @@ resource "aws_ecs_task_definition" "api-long-operation" {
       memory = 512
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 8080
+          hostPort      = 8080
           protocol      = "tcp"
           appProtocol   = "http"
         }

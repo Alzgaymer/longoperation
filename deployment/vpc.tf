@@ -131,12 +131,13 @@ resource "aws_lb" "fargate_nlb" {
 # Target group for the NLB
 resource "aws_lb_target_group" "fargate" {
   name        = "fargate-tg"
-  port        = 80
+  port        = 8080
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
 
   health_check {
+    path                = "/health"
     enabled             = true
     healthy_threshold   = 2
     unhealthy_threshold = 2
