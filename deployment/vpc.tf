@@ -135,21 +135,12 @@ resource "aws_lb_target_group" "fargate" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
-
-  health_check {
-    path                = "/health"
-    enabled             = true
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    interval            = 30
-    protocol            = "HTTP"
-  }
 }
 
 # NLB listener
 resource "aws_lb_listener" "fargate" {
   load_balancer_arn = aws_lb.fargate_nlb.arn
-  port              = 80
+  port              = 8080
   protocol          = "TCP"
 
   default_action {
