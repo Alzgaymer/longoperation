@@ -144,6 +144,7 @@ resource "aws_lb_target_group" "fargate" {
     path                = "/health"
     protocol            = "HTTP"
     matcher             = "200"
+    port                = var.container_port
   }
 }
 
