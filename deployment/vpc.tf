@@ -142,7 +142,7 @@ resource "aws_lb_target_group" "fargate" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     interval            = 30
-    protocol            = "TCP"
+    protocol            = "HTTP"
   }
 }
 
