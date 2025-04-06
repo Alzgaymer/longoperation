@@ -9,6 +9,8 @@ module "mongo_secrets" {
     password = var.mongo_password
   })
 
+  recovery_window_in_days = 0
+
   create_policy       = true
   block_public_policy = true
   policy_statements = {
