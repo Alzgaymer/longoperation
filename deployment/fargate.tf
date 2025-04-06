@@ -53,7 +53,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
       environment = [
         {
           name  = "PORT"
-          value = var.container_port
+          value = "${var.container_port}"
         }
       ]
       secrets = [
