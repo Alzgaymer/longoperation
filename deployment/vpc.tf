@@ -131,7 +131,7 @@ resource "aws_lb" "fargate_nlb" {
 # Target group for the NLB
 resource "aws_lb_target_group" "fargate" {
   name        = "fargate-tg"
-  port        = 8080
+  port        = var.container_port
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
@@ -140,7 +140,7 @@ resource "aws_lb_target_group" "fargate" {
 # NLB listener
 resource "aws_lb_listener" "fargate" {
   load_balancer_arn = aws_lb.fargate_nlb.arn
-  port              = 8080
+  port              = var.container_port
   protocol          = "TCP"
 
   default_action {

@@ -18,7 +18,7 @@ resource "aws_ecs_service" "api-long-operation" {
   load_balancer {
     target_group_arn = aws_lb_target_group.fargate.arn
     container_name   = "api-long-operation"
-    container_port   = 80
+    container_port   = var.container_port
   }
 }
 
@@ -44,8 +44,8 @@ resource "aws_ecs_task_definition" "api-long-operation" {
       memory = 512
       portMappings = [
         {
-          containerPort = 8080
-          hostPort      = 8080
+          containerPort = var.container_port
+          hostPort      = var.container_port
           protocol      = "tcp"
           appProtocol   = "http"
         }

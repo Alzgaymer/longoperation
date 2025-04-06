@@ -32,3 +32,9 @@ variable "mongo_username" {
   type        = string
   sensitive   = true
 }
+
+variable "container_port" {
+  description = "Container port for the Fargate service"
+  type        = number
+  default     = 8080
+}
