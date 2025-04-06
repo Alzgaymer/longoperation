@@ -135,6 +135,16 @@ resource "aws_lb_target_group" "fargate" {
   protocol    = "TCP"
   target_type = "ip"
   vpc_id      = aws_vpc.main.id
+
+  health_check {
+    healthy_threshold   = 2
+    interval            = 30
+    timeout             = 5
+    unhealthy_threshold = 2
+    path                = "/health"
+    protocol            = "TCP"
+    matcher             = "200-299"
+  }
 }
 
 # NLB listener
