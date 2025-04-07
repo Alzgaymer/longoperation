@@ -85,7 +85,7 @@ paths:
           $ref: "#/components/responses/create-waitfor"
       x-amazon-apigateway-integration:
         type: "http_proxy"
-        uri: "http://${fargate_service_url}/api/v1/operations"
+        uri: "http://${fargate_service_url}:${container_port}/api/v1/operations"
         httpMethod: "POST"
         connectionType: "VPC_LINK"
         connectionId: "${vpc_link_id}"
@@ -102,7 +102,7 @@ paths:
           $ref: "#/components/responses/get-waitfor"
       x-amazon-apigateway-integration:
         type: "http_proxy"
-        uri: "http://${fargate_service_url}/api/v1/operations/{id}"
+        uri: "http://${fargate_service_url}:${container_port}/api/v1/operations/{id}"
         httpMethod: "GET"
         connectionType: "VPC_LINK"
         connectionId: "${vpc_link_id}"
