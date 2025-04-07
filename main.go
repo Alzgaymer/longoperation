@@ -115,7 +115,7 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Operation-Location", fmt.Sprintf("http://localhost:8080/api/v1/operations/%s", operationID))
+		w.Header().Set("Operation-Location", fmt.Sprintf("/api/v1/operations/%s", operationID))
 		w.Header().Set("Operation-ID", operationID)
 		w.Header().Set("Retry-After", strconv.Itoa(int(req.WaitFor)))
 		w.WriteHeader(http.StatusAccepted)
