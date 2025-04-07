@@ -15,11 +15,24 @@ resource "aws_ecs_service" "api-long-operation" {
     subnets         = aws_subnet.private[*].id
     security_groups = [aws_security_group.long-operation-sg.id]
   }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.fargate.arn
     container_name   = "api-long-operation"
     container_port   = var.container_port
   }
+
+  lifecycle {
+    replace_triggered_by = [
+      data.aws_ecr_image.long-api.image_digest
+    ]
+  }
+}
+
+data "aws_ecr_image" "long-api" {
+  repository_name = aws_ecr_repository.api-long_operation_registry.name
+  most_recent     = true
+  image_tag       = "latest"
 }
 
 resource "aws_ecs_task_definition" "api-long-operation" {
@@ -39,7 +52,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
   container_definitions = jsonencode([
     {
       name   = "api-long-operation"
-      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}:latest"
+      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}:${data.aws_ecr_image.long-api.image_digest}"
       cpu    = 256
       memory = 512
       portMappings = [
