@@ -36,5 +36,5 @@ resource "aws_security_group_rule" "allow_healthcheck" {
   protocol          = "tcp"
   type              = "ingress"
   security_group_id = aws_security_group.long-operation-sg.id
-  cidr_blocks       = ["10.0.0.0/16"]
+  cidr_blocks       = [aws_vpc.main.cidr_block]
 }
