@@ -31,7 +31,6 @@ resource "aws_ecs_service" "api-long-operation" {
 
 data "aws_ecr_image" "long-api" {
   repository_name = aws_ecr_repository.api-long_operation_registry.name
-  most_recent     = true
   image_tag       = "latest"
 }
 
