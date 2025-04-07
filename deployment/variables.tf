@@ -6,7 +6,8 @@ variable "region" {
 variable "white-list" {
   type = list(string)
   default = [
-    "212.23.203.92/32"
+    "212.23.203.92/32",
+    "104.28.129.60/32"
   ]
   sensitive = true
 }
