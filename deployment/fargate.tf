@@ -21,17 +21,6 @@ resource "aws_ecs_service" "api-long-operation" {
     container_name   = "api-long-operation"
     container_port   = var.container_port
   }
-
-  lifecycle {
-    replace_triggered_by = [
-      data.aws_ecr_image.long-api.image_digest
-    ]
-  }
-}
-
-data "aws_ecr_image" "long-api" {
-  repository_name = aws_ecr_repository.api-long_operation_registry.name
-  image_tag       = "latest"
 }
 
 resource "aws_ecs_task_definition" "api-long-operation" {
@@ -51,7 +40,7 @@ resource "aws_ecs_task_definition" "api-long-operation" {
   container_definitions = jsonencode([
     {
       name   = "api-long-operation"
-      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}:${data.aws_ecr_image.long-api.image_digest}"
+      image  = "${aws_ecr_repository.api-long_operation_registry.repository_url}:latest"
       cpu    = 256
       memory = 512
       portMappings = [
