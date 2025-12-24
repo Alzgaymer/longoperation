@@ -70,7 +70,8 @@ Long Operation API is a web service that manages long-running asynchronous opera
 - Never expose internal error details to clients in production
 
 ### Database Operations
-- Always pass `context.Background()` or request context to MongoDB operations
+- Use request context for MongoDB operations to enable proper timeout handling and cancellation
+- Use `context.Background()` only for application lifecycle operations (e.g., connecting/disconnecting)
 - Use BSON for MongoDB documents
 - Close database connections properly (defer disconnect)
 
