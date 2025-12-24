@@ -43,7 +43,7 @@ func ConnectMongoOrDie() *mongo.Client {
 
 	credsStr := os.Getenv("MONGODB_CREDENTIALS")
 
-	slog.Debug("Retrieving MongoDB credentials", "creds", credsStr)
+	slog.Debug("Retrieving MongoDB credentials")
 
 	type MongoCredentials struct {
 		Username string `json:"username"`
@@ -58,7 +58,7 @@ func ConnectMongoOrDie() *mongo.Client {
 
 	uri := fmt.Sprintf(fmtConnString, creds.Username, creds.Password)
 
-	slog.Info("Connecting to MongoDB", "uri", uri)
+	slog.Info("Connecting to MongoDB")
 
 	opts := options.Client().SetServerAPIOptions(serverAPI).ApplyURI(uri)
 	client, err := mongo.Connect(opts)
@@ -77,6 +77,12 @@ func ConnectMongoOrDie() *mongo.Client {
 
 func healthCheck(w http.ResponseWriter, r *http.Request) { return }
 
+// maxWaitSeconds is the maximum allowed wait duration for operations
+const maxWaitSeconds = 3600
+
+// dbTimeout is the timeout for database operations
+const dbTimeout = 10 * time.Second
+
 func createOperation(client *mongo.Client) http.HandlerFunc {
 	coll := client.Database("test").Collection("operations")
 	type Request struct {
@@ -94,9 +100,24 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 			return
 		}
 
+		// Validate wait-for parameter
+		if req.WaitFor <= 0 {
+			http.Error(w, "wait-for must be a positive integer", http.StatusBadRequest)
+			return
+		}
+		if req.WaitFor > maxWaitSeconds {
+			http.Error(w, fmt.Sprintf("wait-for must not exceed %d seconds", maxWaitSeconds), http.StatusBadRequest)
+			return
+		}
+
 		operationID := uuid.NewString()
+
+		// Use timeout context for database operations
+		ctx, cancel := context.WithTimeout(r.Context(), dbTimeout)
+		defer cancel()
+
 		_, err = coll.UpdateOne(
-			context.Background(),
+			ctx,
 			bson.M{"_id": operationID},
 			bson.M{
 				"$set": bson.D{
@@ -123,7 +144,9 @@ func createOperation(client *mongo.Client) http.HandlerFunc {
 
 		go func() {
 			time.Sleep(time.Duration(req.WaitFor) * time.Second)
-			_, err = coll.UpdateByID(context.Background(), operationID, bson.D{
+			updateCtx, updateCancel := context.WithTimeout(context.Background(), dbTimeout)
+			defer updateCancel()
+			_, err = coll.UpdateByID(updateCtx, operationID, bson.D{
 				{"$set", bson.D{
 					{"status", "Finished"},
 				}},
@@ -150,7 +173,11 @@ func getOperation(client *mongo.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 
-		result := coll.FindOne(context.Background(), bson.M{"_id": id})
+		// Use timeout context for database operations
+		ctx, cancel := context.WithTimeout(r.Context(), dbTimeout)
+		defer cancel()
+
+		result := coll.FindOne(ctx, bson.M{"_id": id})
 		if result.Err() != nil {
 			http.Error(w, result.Err().Error(), http.StatusNotFound)
 			return
